@@ -1,0 +1,10 @@
+# Entornos virtuales
+.venv/
+venv/
+
+# Cache de Python
+__pycache__/
+*.py[cod]
+
+# Respaldos automaticos de Jupyter (NO afecta las salidas del .ipynb)
+.ipynb_checkpoints/
