@@ -5,7 +5,16 @@ __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
 
-# Datos descargados y artefactos generados
+# Datos descargados
 /data/
-/outputs/
 /tmp/
+
+# Resultados: conservar solo evidencia final ligera de Task 1
+/outputs/*
+!/outputs/task1/
+/outputs/task1/*
+!/outputs/task1/final_grid.png
+!/outputs/task1/grid_evolution.png
+!/outputs/task1/losses.png
+!/outputs/task1/history.csv
+!/outputs/task1/training_summary.json

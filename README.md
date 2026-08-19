@@ -4,6 +4,14 @@ Proyecto de **CC3092 - Deep Learning y Sistemas Inteligentes**. El objetivo es
 implementar una DCGAN desde cero con PyTorch, estudiar experimentalmente sus
 fallas y conectar los resultados con la literatura de GANs.
 
+## Estado actual
+
+- [x] Dataset de 898 sprites RGB de 64x64 descargado y validado.
+- [x] Task 1 entrenado durante 50 epocas.
+- [x] Historial, 50 grids, grilla final, evolucion y curvas generadas.
+- [x] Analisis de Task 1 documentado en `reports/HDT2.md`.
+- [ ] Task 2: colapso de modo y estimacion JSD.
+- [ ] Task 3: investigacion del paper.
 
 ## Estructura del proyecto
 
