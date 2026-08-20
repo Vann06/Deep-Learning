@@ -112,21 +112,43 @@ El historial se guarda en `outputs/task1/history.csv` y las grillas en
 - [x] Backward y actualizacion de ambos optimizadores.
 - [x] Smoke test de una epoca con datos sinteticos.
 - [x] Lectura de un batch real `(32, 3, 64, 64)`.
-- [ ] Entrenamiento completo de 50 epocas.
-- [ ] Revision de las 50 grillas.
+- [x] Entrenamiento completo de 50 epocas.
+- [x] Revision de las 50 grillas.
 
 | Resultado | Valor observado |
 |---|---|
-| Tiempo total de entrenamiento | _[Pendiente]_ |
-| `loss_G` final | _[Pendiente]_ |
-| `loss_D` final | _[Pendiente]_ |
-| Epoca con perdidas mas cercanas | _[Pendiente]_ |
-| Observacion principal | _[Pendiente]_ |
+| Tiempo total de entrenamiento | 2,564.13 s (42 min 44 s), CPU |
+| `loss_G` inicial / final | 9.6023 / 4.6684 |
+| `loss_D` inicial / final | 0.3592 / 0.3728 |
+| Promedio de `loss_G` en las ultimas 10 epocas | 4.7752 |
+| Promedio de `loss_D` en las ultimas 10 epocas | 0.6000 |
+| Epoca con perdidas mas cercanas | 47: G=4.2218, D=0.4328 |
+| Diferencia minima entre perdidas | 3.7890 |
+| Observacion principal | Mejora visual sin convergencia adversarial completa |
 
 ### Analisis del entrenamiento
 
-_[Describir como evolucionaron D y G. Evitar interpretar una perdida aislada
-como garantia de calidad; relacionar las curvas con las grillas generadas.]_
+El discriminador aprendio con mucha mayor rapidez al inicio. En la primera
+epoca se obtuvo `loss_D=0.3592` y `loss_G=9.6023`; en la segunda epoca la
+perdida del generador alcanzo su maximo, 17.5842. Esto indica que D separaba con
+facilidad las muestras reales de las generadas y proporcionaba una senal
+adversarial exigente para G. A partir de aproximadamente la epoca 10,
+`loss_G` descendio al rango 4-6 y permanecio oscilando dentro de ese intervalo,
+mientras `loss_D` se mantuvo generalmente por debajo de 1.0.
+
+Las curvas no son monotonas. Por ejemplo, `loss_D` subio de 0.3208 en la epoca
+31 a 0.9813 en la 32 y luego bajo a 0.3873 en la 33. Esta dinamica es coherente
+con un juego adversarial: una mejora temporal de un modelo altera el problema
+que enfrenta el otro. La epoca 47 minimizo la diferencia absoluta entre las dos
+perdidas, pero la diferencia todavia fue 3.7890. Por lo tanto, el punto anotado
+cumple el criterio solicitado, pero no debe interpretarse como un equilibrio o
+una convergencia perfecta.
+
+Visualmente, las primeras grillas contienen ruido cuadriculado. Para las epocas
+10 y 20 aparecen masas de color compactas y, hacia las epocas 30-50, se observan
+siluetas con distintas escalas, orientaciones, paletas y posibles apendices. La
+mejora visual es clara aunque las imagenes siguen siendo ambiguas y no siempre
+se reconocen como un Pokemon concreto.
 
 ## Task 1.3 - Visualizaciones
 
@@ -134,12 +156,31 @@ como garantia de calidad; relacionar las curvas con las grillas generadas.]_
 
 **Archivo esperado:** `outputs/task1/final_grid.png`
 
-_[Insertar aqui la grilla final. Explicar diversidad, nitidez, colores,
-estructuras reconocibles y artefactos.]_
+![Grilla final de Task 1](../outputs/task1/final_grid.png)
+
+Las 16 muestras finales presentan diversidad de tamano, color y forma. Algunas
+son alargadas, otras compactas y varias sugieren extremidades, alas o cabezas.
+No se observa que las 16 imagenes sean copias de una sola salida, por lo que no
+hay evidencia visual de colapso de modo total en el entrenamiento base. Sin
+embargo, persisten texturas de tablero asociadas a las capas
+`ConvTranspose2d`, contornos poco definidos y estructuras que no alcanzan una
+identidad semantica clara.
+
+### Evolucion con ruido fijo
+
+![Evolucion de los grids](../outputs/task1/grid_evolution.png)
+
+El uso del mismo `fixed_noise` permite seguir cada muestra a traves del tiempo.
+La evolucion pasa de ruido estructurado en la epoca 1 a blobs centrales en la
+10, formas multicolor en la 20 y siluetas mas compactas entre las epocas 30 y
+50. La mayor mejora ocurre en la primera mitad; despues, los cambios son
+principalmente refinamientos de color y borde.
 
 ### Curvas de `loss_G` y `loss_D`
 
 **Archivo esperado:** `outputs/task1/losses.png`
+
+![Curvas de perdidas](../outputs/task1/losses.png)
 
 La figura debe mostrar ambas perdidas durante las 50 epocas y anotar el punto:
 
@@ -147,15 +188,24 @@ La figura debe mostrar ambas perdidas durante las 50 epocas y anotar el punto:
 e^* = \arg\min_e |\operatorname{loss}_G(e)-\operatorname{loss}_D(e)|.
 \]
 
-**Epoca anotada:** _[Pendiente]_  
-**Interpretacion:** _[Pendiente]_
+**Epoca anotada:** 47 (`loss_G=4.2218`, `loss_D=0.4328`).
+**Interpretacion:** fue la menor separacion observada, no un cruce de las
+curvas. D mantuvo una perdida considerablemente menor que G durante todo el
+entrenamiento, lo que sugiere que el discriminador conservo ventaja.
 
 ### Conclusiones de Task 1
 
-1. **Calidad final:** _[Pendiente]_
-2. **Diversidad:** _[Pendiente]_
-3. **Estabilidad del entrenamiento:** _[Pendiente]_
-4. **Limitaciones observadas:** _[Pendiente]_
+1. **Calidad final:** las salidas poseen color y siluetas tipo sprite, pero son
+   borrosas y solo parcialmente reconocibles.
+2. **Diversidad:** existen diferencias visibles de forma, escala y paleta; no
+   se observa colapso total en las 16 muestras finales.
+3. **Estabilidad del entrenamiento:** no hubo NaN ni divergencia numerica. Las
+   perdidas oscilaron, como es esperable en una GAN, y se estabilizaron en un
+   rango durante la segunda mitad.
+4. **Limitaciones observadas:** D permanecio mas fuerte que G, las perdidas no
+   se acercaron realmente y las convoluciones transpuestas produjeron patrones
+   de tablero. Cincuenta epocas y un dataset de 898 imagenes fueron suficientes
+   para aprender estructura global, pero no detalle semantico fino.
 
 ---
 
