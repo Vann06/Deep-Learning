@@ -1,0 +1,8 @@
+{
+  "final_loss_G": 36.91478042602539,
+  "final_loss_D": 3.609915514516615e-05,
+  "mean_D_of_G_z": 1.1334038390486967e-05,
+  "diversity_metric": 0.04487128555774689,
+  "grad_norm_G_final": 0.6647215061674099,
+  "task1_final_grid_diversity_reference": 0.4097561538219452
+}

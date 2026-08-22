@@ -18,3 +18,12 @@ __pycache__/
 !/outputs/task1/losses.png
 !/outputs/task1/history.csv
 !/outputs/task1/training_summary.json
+
+# Resultados: conservar solo evidencia final ligera de Task 2 (mismo criterio que Task 1)
+!/outputs/task2/
+/outputs/task2/*
+!/outputs/task2/collapse_grid.png
+!/outputs/task2/collapse_history.csv
+!/outputs/task2/collapse_summary.json
+!/outputs/task2/jsd_curve.png
+!/outputs/task2/jsd_history.csv

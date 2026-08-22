@@ -233,14 +233,27 @@ epocas con cinco pasos del discriminador por cada paso del generador.
 
 | Metrica | Entrenamiento base | Colapso inducido |
 |---|---:|---:|
-| `loss_G` final | _[Pendiente]_ | _[Pendiente]_ |
-| `loss_D` final | _[Pendiente]_ | _[Pendiente]_ |
-| Media de `D(G(z))` | _[Pendiente]_ | _[Pendiente]_ |
-| Norma del gradiente de G | _[Pendiente]_ | _[Pendiente]_ |
-| Diversidad entre muestras | _[Pendiente]_ | _[Pendiente]_ |
+| `loss_G` final | 4.6684 | 36.9148 |
+| `loss_D` final | 0.3728 | 0.0000361 |
+| Media de `D(G(z))` | _(no medida en Task 1)_ | 0.0000113 |
+| Norma del gradiente de G | _(no medida en Task 1)_ | 0.6647 (epoca 20) |
+| Diversidad entre muestras | 0.4098 | 0.0449 |
 
-_[Insertar la grilla y describir concretamente que elementos se repiten y por
-que la evidencia muestra baja diversidad.]_
+**Archivo:** `outputs/task2/collapse_grid.png`
+
+![Grilla de colapso de modo](../outputs/task2/collapse_grid.png)
+
+La grilla final del experimento 5:1 muestra 16 imagenes visualmente casi
+identicas entre si: la misma textura de ruido granulado en tonos grises,
+verdosos y violaceos, sin las siluetas compactas ni la diversidad de forma
+y color que si aparecen en `outputs/task1/final_grid.png`. La metrica
+cuantitativa de diversidad (desviacion estandar promedio por pixel entre las
+16 muestras) cae de 0.4098 en el entrenamiento base a 0.0449 en el colapso,
+es decir, casi 9 veces menos variacion entre salidas. Esto coincide con
+`collapse_history.csv`: a partir de la epoca 7 `loss_D` se desploma a
+ordenes de `1e-4`-`1e-5` y se mantiene ahi el resto del entrenamiento, senal
+de que D aprendio a rechazar sistematicamente las mismas salidas repetidas
+de G sin que este logre variarlas.
 
 ### Pregunta a)
 
@@ -249,9 +262,51 @@ modo colapso. Incluya que le sucede al gradiente
 \(\nabla_{\theta_G}\mathcal{L}_G\) cuando \(D(G(z)) \approx 0\) para todas las
 muestras y por que el generador no puede recuperarse de ese estado.**
 
-**Respuesta:**  
-_[Pendiente. Incluir la regla de la cadena, los valores de gradiente observados
-y distinguir el objetivo minimax del objetivo no saturante implementado.]_
+**Respuesta:**
+
+La implementacion usa el objetivo no saturante:
+\(\mathcal{L}_G = -\log D(G(z))\), no el minimax original
+\(\mathcal{L}_G^{minimax} = \log(1-D(G(z)))\). La diferencia importa porque,
+por regla de la cadena:
+
+\[
+\nabla_{\theta_G}\mathcal{L}_G =
+-\frac{1}{D(G(z))}\cdot \nabla_{\theta_G}D(G(z))
+\]
+
+mientras que para el objetivo minimax original:
+
+\[
+\nabla_{\theta_G}\mathcal{L}_G^{minimax} =
+-\frac{1}{1-D(G(z))}\cdot \nabla_{\theta_G}D(G(z))
+\]
+
+Cuando \(D(G(z)) \approx 0\), el objetivo minimax original tiene
+\(\nabla_{\theta_G}D(G(z))\) chico (D esta en la parte plana del sigmoid
+donde satura hacia 0, asi que su propio gradiente respecto a la entrada ya es
+casi nulo) y el factor \(1/(1-D(G(z)))\approx 1\) no compensa nada: el
+gradiente completo se desvanece. Esto es el problema clasico de gradiente
+nulo del minimax original. El objetivo no saturante evita justo eso: el
+factor \(1/D(G(z))\) crece sin limite cuando \(D(G(z))\to 0\), amplificando
+la senal en vez de apagarla.
+
+Sin embargo, en el experimento (5 pasos de D por 1 de G, `collapse_history.csv`)
+se observa que ese "arreglo" no basta cuando D domina demasiado: la norma de
+`grad_norm_G` promedio en las primeras 6 epocas es 78.29, pero a partir de la
+epoca 7 (cuando `loss_D` cae a ordenes de `1e-4` y `mean_D_of_G_z=0.0000113`,
+practicamente 0) la norma promedio de las 14 epocas restantes se desploma a
+0.22 — una caida de mas de 350 veces. La razon es que aunque el factor
+\(1/D(G(z))\) crece, D se vuelve tan confiado y tan "plano" en la region
+donde G genera muestras (todas caen del mismo lado de la frontera de
+decision, lejos del margen) que \(\nabla_{\theta_G}D(G(z))\) tambien se
+acerca a cero: D ya no distingue nada entre las salidas de G, asi que no hay
+direccion util que seguir para mejorar. El generador queda atrapado
+produciendo siempre variaciones minimas de la misma salida (ver la grilla de
+`collapse_grid.png`, diversidad 0.0449 contra 0.4098 del entrenamiento base)
+porque el gradiente que recibe ya no distingue una salida "un poco mejor" de
+otra "un poco peor" — no hay senal de mejora posible sin que D cambie
+primero, y con 5 pasos de D por cada paso de G, D siempre llega antes a
+consolidar esa region plana.
 
 ### Pregunta b)
 
@@ -265,9 +320,25 @@ Usar como punto de partida:
 D^*(x)=\frac{p_{data}(x)}{p_{data}(x)+p_G(x)}.
 \]
 
-**Respuesta:**  
-_[Pendiente. Sustituir el comportamiento relativo de las dos densidades en la
-region repetida por G.]_
+**Respuesta:**
+
+En la region donde G repite siempre la misma salida (o variaciones minimas de
+ella), G concentra una masa de probabilidad \(p_G(x)\) muy alta en un
+conjunto muy pequeno de puntos, mientras que \(p_{data}(x)\) esta repartida
+sobre las 898 imagenes reales del dataset y por lo tanto es comparativamente
+baja en cualquier punto especifico, incluida esa region repetida. Sustituyendo
+en la formula del discriminador optimo:
+
+\[
+D^*(x)=\frac{p_{data}(x)}{p_{data}(x)+p_G(x)}
+\]
+
+si \(p_G(x) \gg p_{data}(x)\) en esa region, entonces \(D^*(x) \to 0\). Esto
+es exactamente lo que se midio en el experimento: `mean_D_of_G_z = 0.0000113`
+sobre el `fixed_noise` final, es decir, D asigna practicamente 0 de
+probabilidad de que esas imagenes repetidas sean reales. D identifica con
+altisima confianza que esas muestras son falsas precisamente porque G las
+sobre-produce respecto a lo que existe en los datos reales.
 
 ### Pregunta c)
 
@@ -275,9 +346,29 @@ region repetida por G.]_
 cambiar la proporcion de pasos, que pueda prevenir el modo colapso. Justifique
 por que funcionaria en terminos del gradiente.**
 
-**Modificacion propuesta:** _[Pendiente]_  
-**Justificacion matematica:** _[Pendiente]_  
-**Como se incorporaria al loop:** _[Pendiente]_
+**Modificacion propuesta:** suavizado de etiquetas (_one-sided label
+smoothing_): en el paso de D, en vez de usar la etiqueta dura `1` para los
+datos reales, usar `0.9` (las etiquetas falsas se dejan en `0`).
+
+**Justificacion matematica:** con `BCELoss`, el gradiente de D respecto a su
+salida para un ejemplo real es proporcional a `(D(x) - etiqueta)`. Si la
+etiqueta es `1`, D es empujado a acercar `D(x)` lo mas posible a 1, lo cual
+lo vuelve extremadamente confiado y crea justo la region "plana" descrita en
+la pregunta a): una vez que D separa perfectamente reales de falsas, el
+gradiente que le regresa a G a traves de `D(G(z))` pierde curvatura util.
+Con etiqueta suavizada a `0.9`, D nunca es forzado a la certeza absoluta;
+sigue aprendiendo a distinguir, pero mantiene una superficie de decision con
+mas pendiente (menos saturada) alrededor de `D(G(z))`, porque su propio
+objetivo ya no premia la confianza extrema. Eso significa que
+\(\nabla_{\theta_G}D(G(z))\) en la formula de la pregunta a) es menos
+probable que colapse a 0, incluso si D sigue entrenandose 5 veces mas que G.
+
+**Como se incorporaria al loop:** en `train_collapse`, cambiar
+`real_labels = torch.ones(batch_size, device=DEVICE)` por
+`real_labels = torch.full((batch_size,), 0.9, device=DEVICE)` unicamente en
+el calculo de `loss_d_real` (el paso de G sigue usando etiqueta `1` en su
+`g_labels`, porque ahi lo que se quiere es que G maximice `D(G(z))`, no
+suavizar el objetivo de G).
 
 ## Task 2.2 - Estimacion empirica de Jensen-Shannon
 
@@ -306,16 +397,25 @@ Para evitar ambiguedad, registrar directamente:
 
 ### Curva JSD
 
-**Archivo esperado:** `outputs/task2/jsd_curve.png`
+**Archivo:** `outputs/task2/jsd_curve.png`
+
+![Curva de JSD estimada](../outputs/task2/jsd_curve.png)
 
 | Momento | Epoca | JSD estimada |
 |---|---:|---:|
-| Inicio | _[Pendiente]_ | _[Pendiente]_ |
-| Mitad | _[Pendiente]_ | _[Pendiente]_ |
-| Final | _[Pendiente]_ | _[Pendiente]_ |
+| Inicio | 1 | 0.5136 |
+| Mitad | 25 | 0.4543 |
+| Final | 50 | 0.5067 |
 
-_[Insertar la curva y describir su tendencia, oscilaciones y posibles valores
-fuera del intervalo teorico producidos por la aproximacion.]_
+La curva completa (`jsd_history.csv`, 50 valores) oscila entre 0.2000
+(epoca 3) y 0.5687 (epoca 7), sin ninguna tendencia sostenida a la baja. No
+hay convergencia visible: el valor final (epoca 50, 0.5067) es practicamente
+igual al inicial (epoca 1, 0.5136), y hay picos y valles bruscos a lo largo
+de todo el entrenamiento (por ejemplo cae a 0.2028 en la epoca 32 y sube a
+0.5344 en la epoca 31, justo la epoca anterior). Todos los 50 valores caen
+dentro del rango teorico valido \([0, \log 2] = [0, 0.6931]\) nats, es decir,
+la aproximacion no produjo valores invalidos en este caso, aunque eso no
+implica que sea precisa (ver pregunta a).
 
 ### Pregunta a)
 
@@ -324,24 +424,68 @@ fuera del intervalo teorico producidos por la aproximacion.]_
 entrenamiento alternado. En que direccion sesga este supuesto el estimado: lo
 sobreestima o lo subestima? Por que?**
 
-**Respuesta:**  
-_[Pendiente. Comparar \(V(D,G)\) con el maximo \(V(D^*,G)\).]_
+**Respuesta:**
+
+Lo subestima. Por definicion, \(D^*\) es el discriminador que _maximiza_
+\(V(D,G)\) para un \(G\) fijo, asi que para cualquier \(D\) real (no optimo)
+se cumple \(V(D,G) \le V(D^*,G)\). Como
+\(\widehat{\mathrm{JSD}} = (\widehat{V}(D,G)+\log 4)/2\) es una funcion
+creciente de \(V(D,G)\), un \(V(D,G)\) menor al maximo produce un
+\(\widehat{\mathrm{JSD}}\) menor al JSD real. En el entrenamiento alternado
+de Task 1, D nunca llega a ser optimo para el G de cada epoca porque ambos se
+actualizan simultaneamente batch a batch (nunca se deja a D converger del
+todo antes de mover a G), asi que el `V(D,G) = -loss_D` calculado aqui es
+consistentemente menor al `V(D*,G)` verdadero, y por lo tanto
+\(\widehat{\mathrm{JSD}}\) subestima la divergencia real entre \(p_{data}\)
+y \(p_G\).
 
 ### Pregunta b)
 
 **Hacia el final del entrenamiento, si la GAN converge bien, hacia que valor
 deberia tender JSD? La curva empirica es consistente con ese valor teorico?**
 
-**Valor teorico:** _[Pendiente]_  
-**Valor final observado:** _[Pendiente]_  
-**Conclusion:** _[Pendiente]_
+**Valor teorico:** 0. En convergencia perfecta, \(p_{data}=p_G\), por lo que
+\(D^*(x)=1/2\) en todo el soporte, \(V(D^*,G)=-\log 4\), y sustituyendo en
+\(V(D^*,G)=-\log 4+2\,\mathrm{JSD}(p_{data}\parallel p_G)\) se obtiene
+\(\mathrm{JSD}=0\).
+
+**Valor final observado:** 0.5067 en la epoca 50 (`jsd_history.csv`), muy
+lejos de 0 y practicamente igual al valor de la epoca 1 (0.5136).
+
+**Conclusion:** la curva empirica **no** es consistente con una convergencia
+teorica hacia \(\mathrm{JSD}=0\). Esto coincide con lo ya documentado en
+Task 1: el discriminador mantuvo ventaja sobre el generador durante todo el
+entrenamiento (`loss_D` promedio de las ultimas 10 epocas fue 0.6000 contra
+`loss_G` de 4.7752, una diferencia minima de 3.7890 incluso en la epoca mas
+cercana, la 47). Si D nunca se debilita lo suficiente como para que G
+alcance \(p_{data}\), \(\mathrm{JSD}\) no tiene por que acercarse a 0, y de
+hecho no lo hace: se mantiene oscilando en un rango de 0.20 a 0.57 sin
+tendencia clara durante las 50 epocas.
 
 ### Conclusiones de Task 2
 
-1. **Evidencia de colapso:** _[Pendiente]_
-2. **Comportamiento del gradiente:** _[Pendiente]_
-3. **Evolucion de JSD:** _[Pendiente]_
-4. **Diferencia entre teoria y estimacion empirica:** _[Pendiente]_
+1. **Evidencia de colapso:** entrenar D con 5 pasos por cada paso de G
+   durante 20 epocas produjo un colapso de modo claro: la diversidad entre
+   las 16 muestras finales cayo de 0.4098 (Task 1) a 0.0449 (`collapse_summary.json`),
+   y la grilla `collapse_grid.png` muestra 16 imagenes visualmente casi
+   identicas, sin las siluetas ni la variedad de color de la grilla base.
+2. **Comportamiento del gradiente:** la norma de `grad_norm_G` se desploma de
+   un promedio de 78.29 en las primeras 6 epocas a 0.22 en las 14 restantes
+   (`collapse_history.csv`), coincidiendo con el momento en que `loss_D` cae
+   a ordenes de `1e-4`-`1e-5` y `mean_D_of_G_z` llega a 0.0000113. El
+   generador queda sin senal util para mejorar porque D deja de distinguir
+   entre sus salidas.
+3. **Evolucion de JSD:** la curva estimada (`jsd_history.csv`, 50 epocas)
+   oscila entre 0.20 y 0.57 nats sin tendencia a la baja; el valor final
+   (0.5067, epoca 50) es casi igual al inicial (0.5136, epoca 1). No hay
+   evidencia de convergencia hacia el valor teorico de 0.
+4. **Diferencia entre teoria y estimacion empirica:** el estimado asume un
+   D optimo que nunca se tiene durante el entrenamiento alternado, por lo
+   que el `JSD_hat` calculado aqui subestima sistematicamente la divergencia
+   real entre `p_data` y `p_G` (ver pregunta a de 2.2). Aun con esa
+   subestimacion, el hecho de que ni siquiera el valor subestimado se acerque
+   a 0 refuerza que el entrenamiento base de Task 1 no logro una convergencia
+   real del juego adversarial.
 
 ---
 
@@ -420,13 +564,13 @@ el codigo, los datos, las diapositivas o los papers originales.
 |---|---|---|---|---|
 | Planificacion | _[Completar]_ | Organizar el trabajo | _[Completar]_ | PDF y repo |
 | Task 1 | _[Completar]_ | _[Completar]_ | _[Completar]_ | Pruebas y resultados |
-| Task 2 | _[Completar]_ | _[Completar]_ | _[Completar]_ | Formulas y experimento |
+| Task 2 | "Implementa el plan de Task 2 (notebook y reporte)" a partir de un plan por fases y criterios de aceptacion ya acordado con el usuario | Generar el codigo del experimento de colapso 5:1, la derivacion de JSD desde `history.csv` de Task 1, y redactar las respuestas matematicas del reporte | Permitio pasar de un plan detallado a codigo ejecutable y texto consistente con los resultados reales sin tener que escribir cada formula/celda a mano | Se corrio el notebook completo (`Restart & Run All` equivalente via `nbconvert --execute`), se revisaron los csv/json/png generados y se contrastaron los numeros citados en el reporte contra esos archivos antes de darlos por buenos |
 | Task 3 | _[Completar]_ | _[Completar]_ | _[Completar]_ | Paper original |
 
 # Lista de verificacion de entrega
 
 - [ ] Task 1 contiene arquitectura, entrenamiento, grilla y curvas.
-- [ ] Task 2 contiene colapso, respuestas matematicas y curva JSD.
+- [x] Task 2 contiene colapso, respuestas matematicas y curva JSD.
 - [ ] Task 3 tiene entre 400 y 600 palabras y cita un venue permitido.
 - [ ] Todas las cifras del reporte existen y tienen etiquetas legibles.
 - [ ] Las conclusiones usan resultados observados, no valores inventados.
