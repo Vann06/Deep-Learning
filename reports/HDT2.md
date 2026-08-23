@@ -495,18 +495,21 @@ tendencia clara durante las 50 epocas.
 
 Seleccionar exactamente una opcion:
 
-- [ ] **Opcion A:** gradiente que desaparece cuando D es demasiado bueno.
+- [x] **Opcion A:** gradiente que desaparece cuando D es demasiado bueno.
   Paper objetivo: WGAN, Arjovsky et al. (2017).
 - [ ] **Opcion B:** inestabilidad y dificultad de evaluar imagenes generadas.
   Paper objetivo: Inception Score o FID, Heusel et al. (2017).
 - [ ] **Opcion C:** colapso de modo y falta de diversidad.
   Paper objetivo: Unrolled GANs, Metz et al. (2017), o MinibatchGAN.
 
-**Paper seleccionado:** _[Pendiente]_  
-**Autores y ano:** _[Pendiente]_  
-**Venue:** _[NeurIPS / ICML / ICLR / CVPR]_  
-**Enlace o DOI:** _[Pendiente]_  
-**Razon de la seleccion:** _[Pendiente]_
+**Paper seleccionado:** _Wasserstein GAN_  
+**Autores y ano:** Martin Arjovsky, Soumith Chintala y Leon Bottou (2017)  
+**Venue:** ICML  
+**Enlace o DOI:** arXiv:1701.07875  
+**Razon de la seleccion:** el entrenamiento 5:1 de Task 2.1 produjo exactamente
+el escenario que este paper ataca (D demasiado fuerte, gradiente de G
+desplomado), lo que permite una conexion directa y con evidencia numerica
+propia en la pregunta c).
 
 La seccion final debe tener entre **400 y 600 palabras**, sin contar referencias.
 
@@ -517,8 +520,28 @@ formaliza matematicamente? No basta con nombrar el problema; debe explicarse la
 formulacion tal como aparece en el paper.**
 
 **Respuesta:**  
-_[Pendiente. Definir variables, distribuciones y ecuaciones antes de interpretar
-su significado.]_
+Principalmente, el problema que soluciona esta investigacion es el del
+gradiente cero (o \(\nabla = 0\)). ¿Que nos quiere decir esto? Basicamente,
+que en las GAN originales, cuando el discriminador puede reconocer muy
+facilmente que un conjunto de datos del generador es evidentemente falso, el
+entrenamiento se estanca.
+
+Al usar una funcion sigmoide en las GAN clasicas, devolvemos un valor entre
+\(0\) y \(1\). Esto quiere decir que si los datos son muy malos o muy
+evidentemente falsos, el modelo va a devolver un \(0\). El problema real al
+que este equipo se enfrento es que si el generador mejora un poco, pero no
+mejora lo suficiente, el modelo va a regresar nuevamente \(0\).
+
+Al no haber un cambio en la respuesta, la metrica matematica (la divergencia
+de Jensen-Shannon) se vuelve una constante y el gradiente o nabla pasa a ser
+practicamente cero:
+
+\[
+\nabla_{\theta} JSD(P_{real} \| P_{falso}) = 0
+\]
+
+Al ser cero, el modelo no lograba aprender de manera correcta, por lo que no
+habia una solucion clara para esto.
 
 ## Pregunta b) - Modificacion propuesta
 
@@ -527,7 +550,25 @@ al procedimiento de entrenamiento? Escriba la nueva funcion objetivo si el
 paper la propone.**
 
 **Respuesta:**  
-_[Pendiente. Comparar explicitamente el metodo original y el metodo propuesto.]_
+Sin embargo, lo que ellos propusieron fue hacer algo diferente. En vez de
+tratar esto como una sigmoide que devuelve un valor entre \(0\) y \(1\), la
+idea fue devolver un numero real continuo para poder decir cual es la
+distancia exacta a la que estan los datos falsos de los verdaderos. Esta
+nueva metrica se conoce como la Distancia de Wasserstein:
+
+\[
+W(P_{real}, P_{falso}) = \sup_{\|f\|_{L} \leq 1} \mathbb{E}_{x \sim P_{real}}[f(x)] - \mathbb{E}_{x \sim P_{falso}}[f(x)]
+\]
+
+Podemos tomarlo como un sistema de coordenadas. Es decir, podemos nosotros
+decir que el modelo mide que los datos falsos estan a cierta distancia
+numerica de los verdaderos. Entonces, al medirlo con un numero continuo,
+podemos ver realmente las mejoras paso a paso.
+
+Gracias a esto, tenemos un gradiente que nunca va a llegar a ser nulo, ya que
+siempre vamos a tener las distancias para guiar al modelo. Esto es lo que se
+conoce como WGAN, y como se puede ver en las formulas, en la practica mejoro
+y resolvio por completo el problema del gradiente cero.
 
 ## Pregunta c) - Conexion con Task 2
 
@@ -536,21 +577,104 @@ experimentalmente en Task 2. La conexion debe usar valores concretos de
 perdida, gradiente, salida de D, JSD o diversidad y explicar como el paper los
 habria modificado.**
 
-**Evidencia de Task 2 utilizada:** _[Pendiente]_  
-**Conexion con el paper:** _[Pendiente]_
+**Evidencia de Task 2 utilizada:** en Task 2.1, entrenar D cinco veces por
+cada paso de G provoco que, a partir de la epoca 7, `loss_D` cayera a ordenes
+de \(10^{-4}\)-\(10^{-5}\) y `mean D(G(z))` llegara a 0.0000113. En ese mismo
+punto, `grad_norm_G` se desplomo de un promedio de 78.29 (primeras 6 epocas)
+a 0.22 (14 epocas restantes), una caida de mas de 350 veces. En Task 2.2,
+`JSD_hat` sobre las 50 epocas del entrenamiento base de Task 1 oscilo entre
+0.20 y 0.57 nats sin tendencia a la baja (inicio 0.5136, final 0.5067), lejos
+del valor teorico de convergencia (0).
+
+**Conexion con el paper:** si en vez de la sigmoide de D hubieramos usado el
+critico de WGAN (sin sigmoide, devolviendo un numero real en vez de una
+probabilidad entre 0 y 1), ese gradiente no se habria aplanado igual: aunque
+el critico tambien "ganara" casi todas las comparaciones entre reales y
+falsas, seguiria devolviendo la distancia real (Wasserstein) entre lo que
+genera G y los datos reales, en vez de simplemente un \(0\). Con esa senal
+continua en vez de una probabilidad saturada, `grad_norm_G` probablemente se
+habria mantenido cerca de los valores altos que vimos al inicio (~78) en vez
+de desplomarse a 0.22, y el generador no se habria quedado atrapado
+produciendo siempre la misma salida repetida.
 
 ## Seccion de investigacion final - 400 a 600 palabras
 
-_[Redactar aqui una respuesta integrada que cubra a), b) y c).]_
+Principalmente, el problema que soluciona esta investigacion es el del
+gradiente cero (o \(\nabla = 0\)). ¿Que nos quiere decir esto? Basicamente,
+que en las GAN originales, cuando el discriminador puede reconocer muy
+facilmente que un conjunto de datos del generador es evidentemente falso, el
+entrenamiento se estanca.
 
-**Conteo de palabras:** _[Pendiente]_
+Al usar una funcion sigmoide en las GAN clasicas, devolvemos un valor entre
+\(0\) y \(1\). Esto quiere decir que si los datos son muy malos o muy
+evidentemente falsos, el modelo va a devolver un \(0\). El problema real al
+que este equipo se enfrento es que si el generador mejora un poco, pero no
+mejora lo suficiente, el modelo va a regresar nuevamente \(0\). Al no haber
+un cambio en la respuesta, la metrica matematica (la divergencia de
+Jensen-Shannon) se vuelve una constante y el gradiente o nabla pasa a ser
+practicamente cero:
+
+\[
+\nabla_{\theta} JSD(P_{real} \| P_{falso}) = 0
+\]
+
+Al ser cero, el modelo no lograba aprender de manera correcta, por lo que no
+habia una solucion clara para esto.
+
+Sin embargo, lo que ellos propusieron fue hacer algo diferente. En vez de
+tratar esto como una sigmoide que devuelve un valor entre \(0\) y \(1\), la
+idea fue devolver un numero real continuo para poder decir cual es la
+distancia exacta a la que estan los datos falsos de los verdaderos. Esta
+nueva metrica se conoce como la Distancia de Wasserstein:
+
+\[
+W(P_{real}, P_{falso}) = \sup_{\|f\|_{L} \leq 1} \mathbb{E}_{x \sim P_{real}}[f(x)] - \mathbb{E}_{x \sim P_{falso}}[f(x)]
+\]
+
+Podemos tomarlo como un sistema de coordenadas. Es decir, podemos nosotros
+decir que el modelo mide que los datos falsos estan a cierta distancia
+numerica de los verdaderos. Entonces, al medirlo con un numero continuo,
+podemos ver realmente las mejoras paso a paso. Gracias a esto, tenemos un
+gradiente que nunca va a llegar a ser nulo, ya que siempre vamos a tener las
+distancias para guiar al modelo. Esto es lo que se conoce como WGAN, y como
+se puede ver en las formulas, en la practica mejoro y resolvio por completo
+el problema del gradiente cero.
+
+En la Task 2.1 provocamos este problema a proposito: entrenamos a D cinco
+veces por cada vez que entrenamos a G, para que se volviera "demasiado
+bueno" rapido. Y efectivamente eso fue lo que paso: a partir de la epoca 7,
+`loss_D` se desplomo a valores de \(10^{-4}\)-\(10^{-5}\), y `D(G(z))`
+promedio llego a 0.0000113, practicamente 0. Ahi medimos directamente la
+norma del gradiente de G (`grad_norm_G`) en cada epoca, y se ve clarisimo el
+problema del gradiente cero descrito arriba: en las primeras 6 epocas ese
+gradiente promediaba 78.29, pero apenas D se volvio demasiado confiado
+(epoca 7 en adelante) el promedio cayo a 0.22 en las 14 epocas restantes —
+una caida de mas de 350 veces. G se quedo sin senal util para mejorar, y la
+diversidad entre las 16 imagenes finales cayo de 0.4098 (entrenamiento
+normal de Task 1) a 0.0449 (colapso de modo de Task 2.1).
+
+Si en vez de la sigmoide de D hubieramos usado el critico de WGAN, ese
+gradiente no se habria aplanado igual: aunque el critico tambien "ganara"
+casi todas las comparaciones entre reales y falsas, seguiria devolviendo la
+distancia real (Wasserstein) entre lo que genera G y los datos reales, en
+vez de simplemente un \(0\). Con esa senal continua en vez de una
+probabilidad saturada, `grad_norm_G` probablemente se habria mantenido cerca
+de los valores altos que vimos al inicio (~78) en vez de desplomarse a 0.22,
+y el generador no se habria quedado atrapado produciendo siempre la misma
+salida repetida.
+
+**Conteo de palabras:** ~540 palabras.
 
 ## Referencias
 
 1. Radford, A., Metz, L. y Chintala, S. (2015). _Unsupervised Representation
    Learning with Deep Convolutional Generative Adversarial Networks_.
-2. _[Agregar el paper seleccionado con referencia completa.]_
-3. _[Agregar cualquier fuente primaria adicional utilizada.]_
+2. Arjovsky, M., Chintala, S. y Bottou, L. (2017). _Wasserstein GAN_.
+   Proceedings of the 34th International Conference on Machine Learning
+   (ICML). arXiv:1701.07875.
+3. Goodfellow, I. et al. (2014). _Generative Adversarial Networks_. NeurIPS.
+4. Evidencia experimental propia: `outputs/task2/collapse_history.csv`,
+   `outputs/task2/collapse_summary.json`, `outputs/task2/jsd_history.csv`.
 
 ---
 
@@ -565,13 +689,13 @@ el codigo, los datos, las diapositivas o los papers originales.
 | Planificacion | _[Completar]_ | Organizar el trabajo | _[Completar]_ | PDF y repo |
 | Task 1 | _[Completar]_ | _[Completar]_ | _[Completar]_ | Pruebas y resultados |
 | Task 2 | "Implementa el plan de Task 2 (notebook y reporte)" a partir de un plan por fases y criterios de aceptacion ya acordado con el usuario | Generar el codigo del experimento de colapso 5:1, la derivacion de JSD desde `history.csv` de Task 1, y redactar las respuestas matematicas del reporte | Permitio pasar de un plan detallado a codigo ejecutable y texto consistente con los resultados reales sin tener que escribir cada formula/celda a mano | Se corrio el notebook completo (`Restart & Run All` equivalente via `nbconvert --execute`), se revisaron los csv/json/png generados y se contrastaron los numeros citados en el reporte contra esos archivos antes de darlos por buenos |
-| Task 3 | _[Completar]_ | _[Completar]_ | _[Completar]_ | Paper original |
+| Task 3 | "Formatea mejor la investigacion de Task 3 y ayudame a resolver el punto c), revisando Task 1 y 2 para encontrar la conexion experimental" | Reformatear la investigacion ya redactada sobre WGAN y redactar la pregunta c) conectandola con evidencia real de Task 2 | Permitio ubicar rapidamente los numeros concretos ya registrados (`grad_norm_G`, `mean D(G(z))`, `JSD_hat`) en `reports/HDT2.md` y `notebooks/task2.ipynb` y tejerlos con el argumento teorico del paper sin inventar cifras | Se contrastaron todos los valores citados (78.29, 0.22, 0.0000113, 0.20-0.57 nats) contra `collapse_history.csv`, `collapse_summary.json` y `jsd_history.csv`, y la formulacion matematica contra el abstract/introduccion del paper WGAN (arXiv:1701.07875) |
 
 # Lista de verificacion de entrega
 
 - [ ] Task 1 contiene arquitectura, entrenamiento, grilla y curvas.
 - [x] Task 2 contiene colapso, respuestas matematicas y curva JSD.
-- [ ] Task 3 tiene entre 400 y 600 palabras y cita un venue permitido.
+- [x] Task 3 tiene entre 400 y 600 palabras y cita un venue permitido.
 - [ ] Todas las cifras del reporte existen y tienen etiquetas legibles.
 - [ ] Las conclusiones usan resultados observados, no valores inventados.
 - [ ] Los prompts de IA estan documentados y verificados.

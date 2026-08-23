@@ -1,5 +1,5 @@
 /.venv/
-
+venv/
 # Python y Jupyter
 __pycache__/
 *.py[cod]
