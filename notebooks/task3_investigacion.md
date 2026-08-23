@@ -34,7 +34,6 @@ Ahí medimos directamente la norma del gradiente de G (`grad_norm_G`) en cada é
 
 Si en vez de la sigmoide de D hubiéramos usado el crítico de WGAN, ese gradiente no se habría aplanado igual: aunque el crítico también "ganara" casi todas las comparaciones entre reales y falsas, seguiría devolviendo la distancia real (Wasserstein) entre lo que genera G y los datos reales, en vez de simplemente un $0$. Con esa señal continua en vez de una probabilidad saturada, `grad_norm_G` probablemente se habría mantenido cerca de los valores altos que vimos al inicio (~78) en vez de desplomarse a 0.22, y el generador no se habría quedado atrapado produciendo siempre la misma salida repetida.
 
-**Conteo de palabras (secciones anteriores):** ~540 palabras.
 
 ## Referencias
 
