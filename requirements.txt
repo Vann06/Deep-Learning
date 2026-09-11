@@ -1,0 +1,21 @@
+# Deep Learning
+torch
+
+# Data processing
+numpy
+pandas
+scikit-learn
+
+# Visualizations
+matplotlib
+plotly
+
+# Utilities
+tqdm
+joblib
+
+# MVP
+streamlit
+
+# Kaggle datasets
+kagglehub
