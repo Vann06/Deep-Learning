@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "dataset": {
+    "selected": "IBM AML HI-Small",
+    "kaggle_handle": "ealtman2019/ibm-transactions-for-anti-money-laundering-aml",
+    "filename": "HI-Small_Trans.csv",
+    "sha256": "b19d39f515523373f991b689c07e11e7b0b95c17a2c27a87d91584ae16c5b040",
+    "paysim_rejected_for_sequences": true,
+    "audit_file": "audit/dataset_audit.json"
+  },
+  "config": {
+    "sequence_length": 32,
+    "min_transactions": 3,
+    "normal_to_positive_ratio": 20,
+    "random_state": 42,
+    "train_size": 0.7,
+    "val_size": 0.15,
+    "chunksize": 350000
+  },
+  "sequence_length": 32,
+  "min_transactions": 3,
+  "padding": "post-padding con ceros; mask=True únicamente en pasos reales",
+  "num_features": 49,
+  "feature_names": [
+    "log_amount_paid",
+    "log_amount_received",
+    "log_amount_abs_difference",
+    "log_time_gap_minutes",
+    "hour_sin",
+    "hour_cos",
+    "weekday_sin",
+    "weekday_cos",
+    "same_bank",
+    "same_currency",
+    "destination_changed",
+    "new_destination",
+    "payment_format_ACH",
+    "payment_format_Bitcoin",
+    "payment_format_Cash",
+    "payment_format_Cheque",
+    "payment_format_Credit Card",
+    "payment_format_Reinvestment",
+    "payment_format_Wire",
+    "payment_currency_Australian Dollar",
+    "payment_currency_Bitcoin",
+    "payment_currency_Brazil Real",
+    "payment_currency_Canadian Dollar",
+    "payment_currency_Euro",
+    "payment_currency_Mexican Peso",
+    "payment_currency_Ruble",
+    "payment_currency_Rupee",
+    "payment_currency_Saudi Riyal",
+    "payment_currency_Shekel",
+    "payment_currency_Swiss Franc",
+    "payment_currency_UK Pound",
+    "payment_currency_US Dollar",
+    "payment_currency_Yen",
+    "payment_currency_Yuan",
+    "receiving_currency_Australian Dollar",
+    "receiving_currency_Bitcoin",
+    "receiving_currency_Brazil Real",
+    "receiving_currency_Canadian Dollar",
+    "receiving_currency_Euro",
+    "receiving_currency_Mexican Peso",
+    "receiving_currency_Ruble",
+    "receiving_currency_Rupee",
+    "receiving_currency_Saudi Riyal",
+    "receiving_currency_Shekel",
+    "receiving_currency_Swiss Franc",
+    "receiving_currency_UK Pound",
+    "receiving_currency_US Dollar",
+    "receiving_currency_Yen",
+    "receiving_currency_Yuan"
+  ],
+  "label_definition": "1 si la ventana contiene al menos una transacción Is Laundering=1",
+  "sender_definition": "From Bank + ':' + Account",
+  "window_policy": "una ventana por remitente; positiva anclada en la última transacción positiva, normal usa las más recientes",
+  "normalization": "log1p + StandardScaler ajustado solo con timesteps TRAIN; cíclicas/binarias sin escalar; categóricas one-hot ajustadas solo con TRAIN",
+  "split_criterion": "70/15/15 estratificado por etiqueta de remitente; ningún remitente compartido; submuestreo normal 20:1 dentro de cada split",
+  "source_timestamp_monotonic": false,
+  "sampling": {
+    "eligible_senders": 185993,
+    "eligible_positive_senders": 2758,
+    "eligible_positive_rate": 0.014828515051641728,
+    "normal_to_positive_ratio_target": 20,
+    "splits": {
+      "train": {
+        "eligible_before_sampling": 130195,
+        "positive_senders": 1931,
+        "normal_senders_available": 128264,
+        "normal_senders_selected": 38620,
+        "selected_senders": 40551
+      },
+      "val": {
+        "eligible_before_sampling": 27898,
+        "positive_senders": 413,
+        "normal_senders_available": 27485,
+        "normal_senders_selected": 8260,
+        "selected_senders": 8673
+      },
+      "test": {
+        "eligible_before_sampling": 27900,
+        "positive_senders": 414,
+        "normal_senders_available": 27486,
+        "normal_senders_selected": 8280,
+        "selected_senders": 8694
+      }
+    }
+  },
+  "splits": {
+    "train": {
+      "shape_X": [
+        40551,
+        32,
+        49
+      ],
+      "shape_y": [
+        40551
+      ],
+      "sequences": 40551,
+      "positive": 1931,
+      "negative": 38620,
+      "positive_rate": 0.047619047619047616,
+      "length_min": 3,
+      "length_median": 15.0,
+      "length_max": 32
+    },
+    "val": {
+      "shape_X": [
+        8673,
+        32,
+        49
+      ],
+      "shape_y": [
+        8673
+      ],
+      "sequences": 8673,
+      "positive": 413,
+      "negative": 8260,
+      "positive_rate": 0.047619047619047616,
+      "length_min": 3,
+      "length_median": 15.0,
+      "length_max": 32
+    },
+    "test": {
+      "shape_X": [
+        8694,
+        32,
+        49
+      ],
+      "shape_y": [
+        8694
+      ],
+      "sequences": 8694,
+      "positive": 414,
+      "negative": 8280,
+      "positive_rate": 0.047619047619047616,
+      "length_min": 3,
+      "length_median": 15.0,
+      "length_max": 32
+    }
+  },
+  "imbalance": {
+    "original_transaction_positive_rate": 0.0010194266045335635,
+    "eligible_sender_positive_rate": 0.014828515051641728,
+    "train_pos_weight_recommended": 20.0,
+    "evaluation_note": "Validation/test conservan el mismo submuestreo 20:1, no la prevalencia operativa original; recalibrar antes de producción."
+  },
+  "files": {
+    "train": "train.npz",
+    "val": "val.npz",
+    "test": "test.npz",
+    "preprocessor": "scaler.pkl",
+    "feature_names": "feature_names.json",
+    "sender_splits": "sender_splits.csv.gz",
+    "validation_context": "val_context.csv.gz",
+    "test_context": "test_context.csv.gz"
+  }
+}

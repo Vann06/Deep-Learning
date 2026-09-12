@@ -1,0 +1,43 @@
+{
+  "paysim": {
+    "dataset": "PaySim",
+    "rows": 6362620,
+    "positive_transactions": 8213,
+    "senders": 6353307,
+    "positive_senders": 8213,
+    "transactions_per_sender": {
+      "mean": 1.0014658507766112,
+      "median": 1.0,
+      "p90": 1.0,
+      "p95": 1.0,
+      "p99": 1.0,
+      "max": 3
+    },
+    "senders_ge_2": 9298,
+    "senders_ge_3": 15,
+    "senders_ge_4": 0,
+    "positive_senders_ge_2": 28,
+    "positive_senders_ge_3": 0,
+    "suitable_for_sender_sequences": false
+  },
+  "ibm_aml": {
+    "dataset": "IBM AML HI-Small",
+    "rows": 5078345,
+    "positive_transactions": 5177,
+    "senders": 496999,
+    "positive_senders": 3376,
+    "transactions_per_sender": {
+      "mean": 10.218018547321021,
+      "median": 2.0,
+      "p75": 5.0,
+      "p90": 29.0,
+      "p95": 46.0,
+      "p99": 92.0,
+      "max": 168672
+    },
+    "senders_ge_4": 142306,
+    "positive_senders_ge_4": 2085,
+    "positive_sender_coverage_ge_4": 0.6175947867298578,
+    "suitable_for_sender_sequences": true
+  }
+}
