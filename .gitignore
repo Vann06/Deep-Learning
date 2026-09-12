@@ -1,1 +1,8 @@
 /.venv
+/.venv_data
+/.runtime
+/.kagglehub
+/tmp
+__pycache__/
+*.py[cod]
+/artifacts/audit/*_sender_summary.csv.gz
