@@ -13,6 +13,26 @@ interfaz.
 - `val_context.csv.gz`, `test_context.csv.gz`: contexto legible por timestep.
 - `audit/dataset_audit.json`: evidencia usada para seleccionar el dataset.
 
+## Etapa A — aprendizaje de la normalidad
+
+Generados por [`02_stage_a_autoencoder.ipynb`](../notebooks/02_stage_a_autoencoder.ipynb):
+
+- `stage_a_model.pt`: autoencoder completo (encoder + decoder) entrenado
+  exclusivamente sobre remitentes normales de TRAIN.
+- `encoder.pt`: solo el encoder — lo que reutiliza la Etapa B por transfer
+  learning. Se carga con `src.models.encoder.load_encoder`.
+- `anomaly_threshold.json`: umbral elegido (F1 máximo sobre VALIDATION), los
+  tres candidatos evaluados, métricas en VAL/TEST, media/desviación del error
+  normal de TRAIN y los controles de honestidad (correlación con longitud,
+  comparación contra baselines triviales).
+
+```python
+from src.evaluation.anomaly import get_anomaly_score
+
+resultado = get_anomaly_score(secuencia, longitud_real)
+# {"score": ..., "z_score": ..., "threshold": ..., "is_anomalous": ...}
+```
+
 ## Carga segura
 
 ```python

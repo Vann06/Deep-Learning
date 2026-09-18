@@ -1,7 +1,9 @@
 /.venv
+/venv
 /.venv_data
 /.runtime
 /.kagglehub
+/data
 /tmp
 __pycache__/
 *.py[cod]

@@ -1,0 +1,80 @@
+{
+  "config": {
+    "num_features": 49,
+    "hidden_size": 64,
+    "latent_size": 32,
+    "num_layers": 1,
+    "dropout": 0.0
+  },
+  "normal_train_error_stats": {
+    "mean": 0.04214978590607643,
+    "std": 0.05097319930791855
+  },
+  "candidates": {
+    "f1_max": {
+      "threshold": 0.11777700483798981,
+      "precision": 0.45526315789473687,
+      "recall": 0.4188861985472155,
+      "f1": 0.4363177805800757,
+      "alert_rate": 0.04381413582382106,
+      "method": "f1_max"
+    },
+    "budget": {
+      "threshold": 0.10623208433389664,
+      "precision": 0.4147465437788018,
+      "recall": 0.4358353510895884,
+      "f1": 0.42502951593860683,
+      "alert_rate": 0.05004035512510089,
+      "method": "budget"
+    },
+    "percentile": {
+      "threshold": 0.0830719843506813,
+      "precision": 0.32653061224489793,
+      "recall": 0.5036319612590799,
+      "f1": 0.39619047619047615,
+      "alert_rate": 0.07344632768361582,
+      "method": "percentile"
+    }
+  },
+  "selected": {
+    "method": "f1_max",
+    "value": 0.11777700483798981
+  },
+  "val_metrics": {
+    "roc_auc": 0.7507460323974462,
+    "pr_auc": 0.2719037809755941,
+    "n_sequences": 8673,
+    "n_positive": 413
+  },
+  "test_metrics": {
+    "roc_auc": 0.7670934560899905,
+    "pr_auc": 0.30842159511867717,
+    "n_sequences": 8694,
+    "n_positive": 414
+  },
+  "feature_error_by_group": {
+    "continuous": 0.29441070556640625,
+    "binary": 0.053175050765275955,
+    "one_hot": 0.01686738431453705
+  },
+  "honesty_checks": {
+    "length_score_correlation": 0.22984578234170713,
+    "baselines": [
+      {
+        "baseline": "autoencoder (Etapa A)",
+        "roc_auc": 0.7507460323974462,
+        "pr_auc": 0.2719037809755941
+      },
+      {
+        "baseline": "longitud de secuencia (trivial)",
+        "roc_auc": 0.5516849486131712,
+        "pr_auc": 0.05477575640220853
+      },
+      {
+        "baseline": "monto promedio (trivial)",
+        "roc_auc": 0.5721807596925583,
+        "pr_auc": 0.052671252490342234
+      }
+    ]
+  }
+}

@@ -25,7 +25,8 @@ alerta.
 ```text
 Deep-Learning/
 ├── notebooks/
-│   └── 01_data_engineering.ipynb   # EDA y construcción reproducible
+│   ├── 01_data_engineering.ipynb   # EDA y construcción reproducible
+│   └── 02_stage_a_autoencoder.ipynb # autoencoder de normalidad (Etapa A)
 ├── scripts/
 │   ├── audit_datasets.py           # compara PaySim e IBM AML
 │   ├── run_data_pipeline.py        # genera secuencias y metadata
@@ -126,13 +127,32 @@ docs/                      decisiones, división y registro de uso de IA
 app/                       interfaz interactiva
 ```
 
+## Etapa A — aprendizaje de la normalidad
+
+[`notebooks/02_stage_a_autoencoder.ipynb`](notebooks/02_stage_a_autoencoder.ipynb)
+entrena un autoencoder GRU exclusivamente sobre remitentes normales de TRAIN.
+El error de reconstrucción enmascarado es el score de anomalía; el umbral se
+justifica con F1 máximo sobre VALIDATION (44 alertas por cada 1,000 remitentes,
+45.5% de precisión) y se evalúa una sola vez en TEST (ROC-AUC 0.767,
+PR-AUC 0.308). El notebook demuestra empíricamente, antes de entrenar, por qué
+la máscara es indispensable, y después, que el score supera ampliamente a
+baselines triviales de longitud y monto — controles anti-confound explícitos.
+Solo consume `artifacts/{train,val,test}.npz`; no vuelve a tocar el CSV
+original. Produce `stage_a_model.pt`, `encoder.pt` (el contrato que reutiliza
+la Etapa B) y `anomaly_threshold.json`.
+
 ## Reproducción
 
 La ruta recomendada es ejecutar
 [`notebooks/01_data_engineering.ipynb`](notebooks/01_data_engineering.ipynb)
 desde la raíz del repositorio. El notebook descarga los datos públicos con
 `kagglehub`, audita ambos datasets, reconstruye los artefactos, genera las figuras
-y ejecuta las validaciones.
+y ejecuta las validaciones. Después puede ejecutarse
+[`notebooks/02_stage_a_autoencoder.ipynb`](notebooks/02_stage_a_autoencoder.ipynb),
+que no requiere descargar nada adicional.
+
+[![Abrir 01 en Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Vann06/Deep-Learning/blob/main/notebooks/01_data_engineering.ipynb)
+[![Abrir 02 en Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Vann06/Deep-Learning/blob/main/notebooks/02_stage_a_autoencoder.ipynb)
 
 También puede utilizarse la línea de comandos:
 
