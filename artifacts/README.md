@@ -59,6 +59,29 @@ probabilidad, pesos_atencion = predict_aml(secuencia, longitud_real)
 El MVP debe combinar `get_anomaly_score` (contexto de anomalía, expresado en
 sigmas) con `predict_aml` (decisión y heatmap), sin pasar por `fusion_model.pkl`.
 
+## MVP: inferencia precomputada
+
+- `mvp_data.csv.gz`: una fila por cada uno de los 8,694 remitentes de TEST, con
+  el score de la Etapa A en bruto y en sigmas, la probabilidad de la Etapa B,
+  los pesos de atención ya recortados a la longitud real, y un párrafo de
+  explicación en lenguaje natural.
+
+Existe para que la interfaz desplegada no tenga que cargar PyTorch. Lo genera
+`scripts/build_mvp_data.py` y el contrato de columnas está en
+[`docs/mvp_contrato.md`](../docs/mvp_contrato.md).
+
+```python
+import json
+import pandas as pd
+
+datos = pd.read_csv("artifacts/mvp_data.csv.gz")
+contexto = pd.read_csv("artifacts/test_context.csv.gz")
+
+fila = datos[datos.sender_id == "235874:80D76EB80"].iloc[0]
+transacciones = contexto[contexto.sender_id == fila.sender_id].sort_values("timestep")
+pesos = json.loads(fila.atencion)   # len(pesos) == len(transacciones)
+```
+
 ## Carga segura
 
 ```python
