@@ -1,0 +1,113 @@
+{
+  "config": {
+    "encoder": {
+      "num_features": 49,
+      "hidden_size": 64,
+      "latent_size": 32,
+      "num_layers": 1,
+      "dropout": 0.0
+    },
+    "attention_size": 32,
+    "head_hidden": 32,
+    "dropout": 0.2
+  },
+  "modelo_conservado": {
+    "arm": "pretrained",
+    "seed": 42
+  },
+  "candidatos": {
+    "f1_max": {
+      "threshold": 0.9521442651748657,
+      "precision": 0.94,
+      "recall": 0.5690072639225182,
+      "f1": 0.708898944193062,
+      "alert_rate": 0.028825089357777008,
+      "method": "f1_max"
+    },
+    "budget": {
+      "threshold": 0.7911523580551147,
+      "precision": 0.6543778801843319,
+      "recall": 0.6876513317191283,
+      "f1": 0.6706021251475797,
+      "alert_rate": 0.05004035512510089,
+      "method": "budget"
+    }
+  },
+  "selected": {
+    "method": "f1_max",
+    "value": 0.9521442651748657
+  },
+  "val_metrics": {
+    "roc_auc": 0.9575233483223798,
+    "pr_auc": 0.7647477307672468,
+    "n_sequences": 8673,
+    "n_positive": 413
+  },
+  "test_metrics": {
+    "roc_auc": 0.9716142733786085,
+    "pr_auc": 0.806993061025188,
+    "n_sequences": 8694,
+    "n_positive": 414
+  },
+  "test_at_threshold": {
+    "threshold": 0.9521442651748657,
+    "precision": 0.9400749063670412,
+    "recall": 0.606280193236715,
+    "f1": 0.7371512481644641,
+    "alert_rate": 0.030710835058661144,
+    "true_positive": 251,
+    "false_positive": 16,
+    "false_negative": 163,
+    "true_negative": 8264
+  },
+  "fusion": {
+    "features": [
+      "score_A",
+      "logit_B"
+    ],
+    "ajustada_en": "validation",
+    "coef": [
+      0.272112637758255,
+      2.8084747791290283
+    ],
+    "intercept": -2.7046778202056885,
+    "test_metrics": {
+      "roc_auc": 0.9714126934117482,
+      "pr_auc": 0.8034968545429737,
+      "n_sequences": 8694,
+      "n_positive": 414
+    }
+  },
+  "ablation": {
+    "('val_pr_auc', 'mean')": {
+      "pretrained": 0.759889,
+      "scratch": 0.72635
+    },
+    "('val_pr_auc', 'std')": {
+      "pretrained": 0.005286,
+      "scratch": 0.015658
+    },
+    "('test_pr_auc', 'mean')": {
+      "pretrained": 0.810707,
+      "scratch": 0.775086
+    },
+    "('test_pr_auc', 'std')": {
+      "pretrained": 0.0044,
+      "scratch": 0.009813
+    },
+    "('test_roc_auc', 'mean')": {
+      "pretrained": 0.972717,
+      "scratch": 0.961795
+    },
+    "('test_roc_auc', 'std')": {
+      "pretrained": 0.001261,
+      "scratch": 0.000839
+    }
+  },
+  "attention_lift": {
+    "media": 5.184102220284153,
+    "mediana": 0.7715985029935837,
+    "fraccion_mayor_a_1": 0.45410628019323673,
+    "n_secuencias": 414
+  }
+}

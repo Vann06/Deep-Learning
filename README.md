@@ -26,7 +26,8 @@ alerta.
 Deep-Learning/
 ├── notebooks/
 │   ├── 01_data_engineering.ipynb   # EDA y construcción reproducible
-│   └── 02_stage_a_autoencoder.ipynb # autoencoder de normalidad (Etapa A)
+│   ├── 02_stage_a_autoencoder.ipynb # autoencoder de normalidad (Etapa A)
+│   └── 03_stage_b_classifier.ipynb  # clasificador con transferencia (Etapa B)
 ├── scripts/
 │   ├── audit_datasets.py           # compara PaySim e IBM AML
 │   ├── run_data_pipeline.py        # genera secuencias y metadata
@@ -127,7 +128,7 @@ docs/                      decisiones, división y registro de uso de IA
 app/                       interfaz interactiva
 ```
 
-## Etapa A — aprendizaje de la normalidad
+## Etapa A: aprendizaje de la normalidad
 
 [`notebooks/02_stage_a_autoencoder.ipynb`](notebooks/02_stage_a_autoencoder.ipynb)
 entrena un autoencoder GRU exclusivamente sobre remitentes normales de TRAIN.
@@ -136,10 +137,43 @@ justifica con F1 máximo sobre VALIDATION (44 alertas por cada 1,000 remitentes,
 45.5% de precisión) y se evalúa una sola vez en TEST (ROC-AUC 0.767,
 PR-AUC 0.308). El notebook demuestra empíricamente, antes de entrenar, por qué
 la máscara es indispensable, y después, que el score supera ampliamente a
-baselines triviales de longitud y monto — controles anti-confound explícitos.
+baselines triviales de longitud y monto, que son nuestros controles
+anti-confound explícitos.
 Solo consume `artifacts/{train,val,test}.npz`; no vuelve a tocar el CSV
 original. Produce `stage_a_model.pt`, `encoder.pt` (el contrato que reutiliza
 la Etapa B) y `anomaly_threshold.json`.
+
+## Etapa B: clasificador supervisado con transferencia y atención
+
+[`notebooks/03_stage_b_classifier.ipynb`](notebooks/03_stage_b_classifier.ipynb)
+reutiliza `encoder.pt` y le añade atención aditiva enmascarada y una cabeza
+binaria, entrenando ya con ambas clases y `pos_weight=20`. El *early stopping*
+usa PR-AUC de validación, no la pérdida.
+
+| Señal | ROC-AUC (TEST) | PR-AUC (TEST) |
+|---|---:|---:|
+| Etapa A (autoencoder) | 0.767 | 0.308 |
+| **Etapa B (clasificador)** | **0.972** | **0.807** |
+| Fusión tardía | 0.971 | 0.804 |
+
+Con el umbral congelado desde validación se alertan 31 remitentes de cada 1,000,
+con 94.0% de precisión y 60.6% de recall.
+
+**Ablación (6 corridas: 2 brazos × 3 semillas).** El encoder preentrenado obtiene
+0.8107 ± 0.0044 de PR-AUC en TEST frente a 0.7751 ± 0.0098 del encoder
+inicializado al azar: **+0.0356 sin traslape entre desviaciones**, así que la
+transferencia desde la Etapa A está justificada empíricamente y no es ruido de
+inicialización.
+
+Dos resultados negativos que se reportan tal cual: la **fusión tardía no mejora**
+al clasificador solo (0.804 contra 0.807), por lo que el MVP debe usar la Etapa B
+directamente; y la atención solo se alinea parcialmente con las transacciones
+etiquetadas (lift mediano 0.772, 45.4% por encima de uniforme), de modo que el
+heatmap muestra dónde miró el modelo pero no prueba cuál transacción fue la
+culpable.
+
+Produce `stage_b_model.pt`, `ablation_results.csv`, `stage_b_threshold.json` y
+`fusion_model.pkl`.
 
 ## Reproducción
 
@@ -147,12 +181,18 @@ La ruta recomendada es ejecutar
 [`notebooks/01_data_engineering.ipynb`](notebooks/01_data_engineering.ipynb)
 desde la raíz del repositorio. El notebook descarga los datos públicos con
 `kagglehub`, audita ambos datasets, reconstruye los artefactos, genera las figuras
-y ejecuta las validaciones. Después puede ejecutarse
-[`notebooks/02_stage_a_autoencoder.ipynb`](notebooks/02_stage_a_autoencoder.ipynb),
-que no requiere descargar nada adicional.
+y ejecuta las validaciones. Después pueden ejecutarse
+[`notebooks/02_stage_a_autoencoder.ipynb`](notebooks/02_stage_a_autoencoder.ipynb)
+y [`notebooks/03_stage_b_classifier.ipynb`](notebooks/03_stage_b_classifier.ipynb),
+que no requieren descargar nada adicional: el 02 consume los `.npz` versionados y
+el 03 consume además `encoder.pt`. Cada notebook es independiente.
 
-[![Abrir 01 en Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Vann06/Deep-Learning/blob/main/notebooks/01_data_engineering.ipynb)
-[![Abrir 02 en Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Vann06/Deep-Learning/blob/main/notebooks/02_stage_a_autoencoder.ipynb)
+Los tres se ejecutan en Colab desde la rama `Proyecto2`; la primera celda clona el
+repositorio e instala `requirements.txt`.
+
+[![Abrir 01 en Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Vann06/Deep-Learning/blob/Proyecto2/notebooks/01_data_engineering.ipynb)
+[![Abrir 02 en Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Vann06/Deep-Learning/blob/Proyecto2/notebooks/02_stage_a_autoencoder.ipynb)
+[![Abrir 03 en Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Vann06/Deep-Learning/blob/Proyecto2/notebooks/03_stage_b_classifier.ipynb)
 
 También puede utilizarse la línea de comandos:
 
