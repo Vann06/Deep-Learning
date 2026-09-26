@@ -1,2 +1,21 @@
 .venv/
 .kagglehub/..
+/venv
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Datasets (se descargan desde el codigo)
+data/
+ETTh1.csv
+
+# Sistema operativo / editores
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/
