@@ -3,6 +3,16 @@
 venv/
 __pycache__/
 .ipynb_checkpoints/
-*.pyc
+*.py[cod]
+
+# Datos, checkpoints y resultados regenerables del laboratorio.
 data/
 models/
+outputs/
+tmp/
+
+# Archivos locales de editores y sistema operativo.
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
