@@ -1,0 +1,8 @@
+# Entorno reproducible para el Laboratorio 9 (Python 3.10 o 3.11 recomendado)
+# PyTorch 2.14.0 y TorchVision 0.29.0 son una pareja compatible.
+torch==2.14.0
+torchvision==0.29.0
+numpy==2.2.6
+matplotlib==3.10.9
+jupyterlab==4.6.4
+ipykernel==7.3.0
