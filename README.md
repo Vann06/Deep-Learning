@@ -64,6 +64,14 @@ python -m ipykernel install --user --name lab9 --display-name "Python 3 (Lab 9)"
 jupyter lab
 ```
 
+### Con GPU NVIDIA (opcional)
+
+Antes de instalar `requirements.txt`, instale la misma versión de PyTorch con CUDA. `requirements.txt` acepta esa variante sin reinstalar.
+
+```powershell
+python -m pip install torch==2.14.0+cu126 torchvision==0.29.0+cu126 --index-url https://download.pytorch.org/whl/cu126
+```
+
 ## macOS o Linux
 
 ```bash
