@@ -1,0 +1,83 @@
+{
+  "semilla": 3045,
+  "dispositivo": "cpu",
+  "sistema": "macOS-26.6.2-arm64-arm-64bit",
+  "torch": "2.13.0",
+  "hilos": 4,
+  "nitidez": {
+    "Reales": 0.08857909590005875,
+    "VAE β=1": 0.04496753588318825,
+    "Difusión w=1": 0.08973707258701324
+  },
+  "tiempos": {
+    "VAE": {
+      "repeticiones_s": [
+        0.00026054203044623137,
+        0.00031945802038535476,
+        0.00029137497767806053
+      ],
+      "mediana_s": 0.00029137497767806053
+    },
+    "Difusión": {
+      "repeticiones_s": [
+        56.23738362500444,
+        56.175745417014696,
+        56.362618541985285
+      ],
+      "mediana_s": 56.23738362500444
+    }
+  },
+  "razon_tiempos": 193006.90839396985,
+  "evaluaciones_por_lote": {
+    "VAE": 1,
+    "Difusión": 1000
+  },
+  "analisis": "El VAE obtuvo nitidez **0.044968**, frente a **0.089737** de difusión y **0.088579** de las imágenes reales. La difusión conserva más variación local; esta métrica también puede aumentar por ruido y no demuestra por sí sola calidad semántica. En la figura, el VAE suaviza contornos y texturas, mientras la difusión conserva más detalle. El VAE tarda **0.000291 s** por 100 imágenes y la difusión **56.237 s**: **193006.9 veces** más tiempo, con 1 frente a 1000 evaluaciones por lote.\n\nEl VAE prioriza velocidad a costa de nitidez: comprime a dos dimensiones y su reconstrucción cuadrática favorece promedios. Su pérdida de validación pasó de **33.2291** a **28.3794**. En la Task 3 la pérdida de difusión pasó de **0.1250** a **0.0408** en 30 épocas. Ambas corridas convergieron sin un entrenamiento adversarial, pero sus pérdidas tienen escalas distintas y una sola semilla no prueba estabilidad general.\n\nPara acelerar difusión implementaría un muestreador de pasos reducidos, por ejemplo DDIM con 50 pasos, y volvería a medir nitidez y fidelidad. Eso reduciría las evaluaciones teóricas de 1000 a 50; no basta con truncar los últimos pasos del muestreador ancestral ni implica una aceleración medida de 20 veces.",
+  "pass_at_k": [
+    [
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.09999999999999998,
+      0.44736842105263164,
+      0.763157894736842
+    ],
+    [
+      0.25,
+      0.8063080495356038,
+      0.9837461300309598
+    ],
+    [
+      0.44999999999999996,
+      0.9702012383900929,
+      0.9999404620147654
+    ],
+    [
+      0.7,
+      0.9996130030959752,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0
+    ]
+  ],
+  "ingenuo_5": [
+    0.0,
+    0.40950999999999993,
+    0.7626953125,
+    0.9496715625,
+    0.99757,
+    1.0
+  ],
+  "promedios": [
+    0.4166666666666667,
+    0.7039151186790505,
+    0.7911407477970945
+  ],
+  "minimo_k_p2": 14,
+  "conclusion": "El promedio aumenta de **0.416667** en pass@1 a **0.791141** en pass@10 (**37.45 puntos porcentuales**). El modelo produce soluciones útiles que no siempre aparecen al primer intento; muestrear y verificar ayuda, pero no corrige P1, donde no se observó ningún éxito."
+}
