@@ -88,3 +88,34 @@ jupyter lab
 Las implementaciones principales del VAE, el proceso forward de difusión, el muestreo y las fórmulas asociadas fueron desarrolladas directamente con tensores de PyTorch, siguiendo las restricciones indicadas en el laboratorio.
 
 Los resultados, gráficas y análisis se obtienen a partir de la ejecución del notebook y se utilizan para justificar las conclusiones del laboratorio.
+
+## Task 4 — Comparación y pass@k
+
+- [Notebook ejecutado](notebooks/04_comparacion_passk.ipynb).
+- [Informe PDF de Task 4](report/RESPUESTAS_TASK4.pdf).
+- [Mediciones y resultados](artifacts/task4/resultados.json).
+
+Se reutilizan las 500 muestras de difusión con `w=1` y los pesos de la U-Net de
+`artifacts/task3/`. Como el repositorio no incluía pesos del VAE, se repitió únicamente
+el entrenamiento de `beta=1` con la arquitectura y configuración de la Task 1.
+Los pesos y el historial de esta ejecución se conservan en `artifacts/task4/`.
+No se modificaron los notebooks de las Tasks 1–3.
+
+La comparación usa 500 imágenes por grupo, todas en `[0,1]`. Los tiempos se miden
+en CPU, con cuatro hilos, lotes de 100 y tres repeticiones; no se mezclan con los
+tiempos de GPU de la Task 3. La semilla es `3045`.
+
+Para reconstruir y ejecutar el notebook y después generar el PDF, desde la raíz:
+
+```bash
+python scripts/build_task4.py
+python scripts/render_task4.py
+python -m unittest discover -s tests -v
+```
+
+El primer comando descarga Fashion-MNIST si hace falta, carga los pesos guardados
+del VAE (o lo entrena si faltan) y vuelve a cronometrar la difusión. Copia las
+definiciones del VAE directamente del notebook 01 para no mantener otra implementación.
+Las figuras temporales quedan en `outputs/task4/` y también se incluyen en el notebook
+y el PDF. La ejecución local registrada usó PyTorch 2.13.0; la versión y el sistema
+exactos se reportan en el notebook y en el JSON, sin atribuirlos al entorno fijado arriba.

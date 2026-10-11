@@ -31,7 +31,7 @@ def main():
 
         **Curso:** Deep Learning 10
 
-        **Autor:** Felipe Aguilar
+        **Autores:** Diego Lopez, Ricardo Godinez, Vianka Castro y Felipe Aguilar
 
         Reutilizamos los pesos y las 500 muestras con $w=1$ de la Task 3.4.
         Como no se incluyeron pesos del VAE en el repositorio, repetimos únicamente
