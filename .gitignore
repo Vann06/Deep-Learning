@@ -1,0 +1,6 @@
+.venv/
+.ipynb_checkpoints/
+__pycache__/
+tmp/
+results/task1/*.csv
+results/task1/*.png
