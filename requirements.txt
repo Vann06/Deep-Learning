@@ -5,4 +5,8 @@ pandas
 matplotlib
 Pillow
 jupyterlab
+scikit-learn
+scipy
+shap
+nbformat
 

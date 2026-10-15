@@ -1,0 +1,7 @@
+client,test_position,original_index,probability_good,rank,feature,encoded_value,original_value,shap_log_odds
+approved,50,175,0.9994466678836219,1,purpose,9.0,used car,1.4632943248574157
+approved,50,175,0.9994466678836219,2,age,53.0,53.0,1.104481383948587
+approved,50,175,0.9994466678836219,3,checking_status,3.0,no checking,1.0068690238008275
+rejected,76,721,0.05174177581999545,1,credit_history,0.0,all paid,-1.316188054861268
+rejected,76,721,0.05174177581999545,2,savings_status,3.0,>=1000,0.9721066182595678
+rejected,76,721,0.05174177581999545,3,credit_amount,433.0,433.0,-0.9653949067025678

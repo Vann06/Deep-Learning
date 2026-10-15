@@ -1,0 +1,253 @@
+{
+  "versions": {
+    "numpy": "2.2.6",
+    "pandas": "2.3.3",
+    "sklearn": "1.7.2",
+    "shap": "0.49.1"
+  },
+  "dataset": {
+    "rows": 1000,
+    "features": 20,
+    "numeric_features": 7,
+    "categorical_features": 13,
+    "train_rows": 800,
+    "test_rows": 200,
+    "good_total": 700,
+    "bad_total": 300
+  },
+  "task_2_1": {
+    "accuracy": 0.775,
+    "auc": 0.7649999999999999
+  },
+  "task_2_2": {
+    "efficiency_max_abs_error": 9.721730620526614e-08,
+    "base_value": 1.4307421474966338,
+    "background_raw_mean": 1.4307421474966338,
+    "base_mean_abs_error": 0.0,
+    "ranking_spearman": 0.6496240601503759,
+    "top5_shap": [
+      {
+        "feature": "checking_status",
+        "mean_abs_shap": 0.7602871335873149,
+        "shap_rank": 1
+      },
+      {
+        "feature": "purpose",
+        "mean_abs_shap": 0.5117311119938271,
+        "shap_rank": 2
+      },
+      {
+        "feature": "credit_amount",
+        "mean_abs_shap": 0.4902134791654752,
+        "shap_rank": 3
+      },
+      {
+        "feature": "duration",
+        "mean_abs_shap": 0.3917476342323034,
+        "shap_rank": 4
+      },
+      {
+        "feature": "savings_status",
+        "mean_abs_shap": 0.296328170727694,
+        "shap_rank": 5
+      }
+    ],
+    "top5_permutation": [
+      {
+        "feature": "checking_status",
+        "permutation_auc_decrease": 0.11899999999999991,
+        "permutation_rank": 1
+      },
+      {
+        "feature": "credit_amount",
+        "permutation_auc_decrease": 0.0762499999999999,
+        "permutation_rank": 2
+      },
+      {
+        "feature": "duration",
+        "permutation_auc_decrease": 0.057904761904761806,
+        "permutation_rank": 3
+      },
+      {
+        "feature": "credit_history",
+        "permutation_auc_decrease": 0.03964285714285705,
+        "permutation_rank": 4
+      },
+      {
+        "feature": "savings_status",
+        "permutation_auc_decrease": 0.026154761904761792,
+        "permutation_rank": 5
+      }
+    ],
+    "approved_position": 50,
+    "approved_index": 175,
+    "approved_probability": 0.9994466678836219,
+    "rejected_position": 76,
+    "rejected_index": 721,
+    "rejected_probability": 0.05174177581999545,
+    "selected_contributions": [
+      {
+        "client": "approved",
+        "test_position": 50,
+        "original_index": 175,
+        "probability_good": 0.9994466678836219,
+        "rank": 1,
+        "feature": "purpose",
+        "encoded_value": 9.0,
+        "original_value": "used car",
+        "shap_log_odds": 1.4632943248574157
+      },
+      {
+        "client": "approved",
+        "test_position": 50,
+        "original_index": 175,
+        "probability_good": 0.9994466678836219,
+        "rank": 2,
+        "feature": "age",
+        "encoded_value": 53.0,
+        "original_value": "53.0",
+        "shap_log_odds": 1.104481383948587
+      },
+      {
+        "client": "approved",
+        "test_position": 50,
+        "original_index": 175,
+        "probability_good": 0.9994466678836219,
+        "rank": 3,
+        "feature": "checking_status",
+        "encoded_value": 3.0,
+        "original_value": "no checking",
+        "shap_log_odds": 1.0068690238008275
+      },
+      {
+        "client": "rejected",
+        "test_position": 76,
+        "original_index": 721,
+        "probability_good": 0.05174177581999545,
+        "rank": 1,
+        "feature": "credit_history",
+        "encoded_value": 0.0,
+        "original_value": "all paid",
+        "shap_log_odds": -1.316188054861268
+      },
+      {
+        "client": "rejected",
+        "test_position": 76,
+        "original_index": 721,
+        "probability_good": 0.05174177581999545,
+        "rank": 2,
+        "feature": "savings_status",
+        "encoded_value": 3.0,
+        "original_value": ">=1000",
+        "shap_log_odds": 0.9721066182595678
+      },
+      {
+        "client": "rejected",
+        "test_position": 76,
+        "original_index": 721,
+        "probability_good": 0.05174177581999545,
+        "rank": 3,
+        "feature": "credit_amount",
+        "encoded_value": 433.0,
+        "original_value": "433.0",
+        "shap_log_odds": -0.9653949067025678
+      }
+    ]
+  },
+  "task_2_3": {
+    "duplicated_feature": "credit_amount",
+    "duplicate_name": "credit_amount_dup",
+    "sigma": 2822.7368759604406,
+    "rows": [
+      {
+        "configuration": "interventional",
+        "original_feature": "credit_amount",
+        "mean_abs_phi_original": 0.5179955692228323,
+        "mean_abs_phi_copy": 0.4284904708597052,
+        "mean_abs_phi_sum": 0.5460257695502253,
+        "baseline_mean_abs_phi_original": 0.4902134791654752
+      },
+      {
+        "configuration": "tree_path_dependent",
+        "original_feature": "credit_amount",
+        "mean_abs_phi_original": 0.38135576333811516,
+        "mean_abs_phi_copy": 0.36297396740911236,
+        "mean_abs_phi_sum": 0.5308188262060202,
+        "baseline_mean_abs_phi_original": 0.4902134791654752
+      }
+    ]
+  },
+  "task_2_4": [
+    {
+      "background_size": 10,
+      "instances": 10,
+      "nsamples_per_instance": 2000,
+      "kernel_seconds": 0.47347650000301655,
+      "seconds_per_instance": 0.04734765000030165,
+      "mae_vs_matching_tree_shap": 0.04523510761339848,
+      "model_rows_nominal": 200000
+    },
+    {
+      "background_size": 50,
+      "instances": 10,
+      "nsamples_per_instance": 2000,
+      "kernel_seconds": 1.7287383999937447,
+      "seconds_per_instance": 0.17287383999937447,
+      "mae_vs_matching_tree_shap": 0.04087525351764344,
+      "model_rows_nominal": 1000000
+    },
+    {
+      "background_size": 100,
+      "instances": 10,
+      "nsamples_per_instance": 2000,
+      "kernel_seconds": 3.2691915999894263,
+      "seconds_per_instance": 0.3269191599989426,
+      "mae_vs_matching_tree_shap": 0.04066641004966413,
+      "model_rows_nominal": 2000000
+    }
+  ],
+  "task_2_5": {
+    "max_abs_error_exact_vs_tree": 2.0973923486877766e-08,
+    "max_efficiency_error": 6.106226635438361e-16,
+    "instances": 5,
+    "coalitions_per_instance": 64
+  },
+  "task_2_6": {
+    "rejected_probability": 0.05174177581999545,
+    "base_probability": 0.8070169246055199,
+    "sum_individual_probability_effects": -0.9457247244991472,
+    "joint_probability_change": -0.7552751487855245,
+    "probability_additivity_gap": -0.19044957571362275,
+    "disagreement_feature": "age",
+    "disagreement_shap_rank": 6,
+    "disagreement_permutation_rank": 20,
+    "disagreement_rank_difference": 14,
+    "top_correlations": [
+      {
+        "feature": "housing",
+        "spearman_correlation": -0.32908967537068456
+      },
+      {
+        "feature": "employment",
+        "spearman_correlation": 0.2805979021952028
+      },
+      {
+        "feature": "personal_status",
+        "spearman_correlation": 0.25564629890691554
+      },
+      {
+        "feature": "residence_since",
+        "spearman_correlation": 0.2347086370754893
+      },
+      {
+        "feature": "num_dependents",
+        "spearman_correlation": 0.19065118631302239
+      }
+    ],
+    "prediction_seconds_100": 0.0007458150999882492,
+    "exact_20_seconds": 782.0438142852784,
+    "exact_20_hours": 0.21723439285702176,
+    "kernel_seconds_per_instance_background_100": 0.3269191599989426,
+    "exact_60_years_at_one_microsecond_per_value": 36533.87788066415
+  }
+}

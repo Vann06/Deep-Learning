@@ -1,0 +1,3 @@
+configuration,original_feature,mean_abs_phi_original,mean_abs_phi_copy,mean_abs_phi_sum,baseline_mean_abs_phi_original
+interventional,credit_amount,0.5179955692228323,0.4284904708597052,0.5460257695502253,0.4902134791654752
+tree_path_dependent,credit_amount,0.38135576333811516,0.36297396740911236,0.5308188262060202,0.4902134791654752
