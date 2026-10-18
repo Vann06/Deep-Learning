@@ -1,0 +1,12 @@
+tecnica,validacion,resultado
+Desempeño del modelo,exactitud / AUC en prueba,0.775 / 0.765
+SHAP,error máximo de eficiencia (200 clientes),9.7e-08
+SHAP,Shapley exacto frente a TreeSHAP,2.1e-08
+SHAP,"MAE de KernelSHAP (fondos 10, 50, 100)","0.045, 0.040, 0.041"
+SHAP frente a permutación,Spearman entre rankings globales,0.645
+Variable sensible,rango de age por SHAP / por permutación,6 / 20
+LIME,Jaccard con N = 500 / 2000 / 5000 (σ_rel = 0.75),0.816 / 0.937 / 1.000
+LIME,"R²_w con K = 5 (aprobado, rechazado, frontera)","0.242, 0.300, 0.279"
+LIME frente a SHAP,Spearman por cliente,"0.737, 0.952, 0.869"
+Contrafactuales,validez (fracción de candidatos válidos),0.855%
+Contrafactuales,contrafactual 1 del rechazado,credit_amount: 433.0 → 392.0; checking_status: 0<=X<200 → no checking (p = 0.777)

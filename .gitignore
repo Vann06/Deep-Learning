@@ -1,6 +1,13 @@
+# Entornos virtuales
 .venv/
+venv/
+
+# Archivos temporales de Python y Jupyter
 .ipynb_checkpoints/
 __pycache__/
 tmp/
-results/task1/*.csv
-results/task1/*.png
+
+# Datos y salidas de otros laboratorios
+data/FashionMNIST/
+data/cifar-10-batches-py/
+outputs/

@@ -1,0 +1,5 @@
+K,R2_w,prediccion_lineal_en_x,variables
+3,0.22289394643504856,0.2747644666987738,"credit_history, credit_amount, duration"
+5,0.29950863489096935,0.2745105882917153,"credit_history, credit_amount, duration, savings_status, other_payment_plans"
+10,0.36312960779306513,0.1250870116855165,"credit_history, credit_amount, duration, savings_status, other_payment_plans, checking_status, residence_since, purpose, personal_status, employment"
+20,0.3719186234369255,0.0439909514751442,"credit_history, credit_amount, duration, savings_status, other_payment_plans, checking_status, residence_since, purpose, personal_status, employment, installment_commitment, housing, age, property_magnitude, other_parties, own_telephone, foreign_worker, job, existing_credits, num_dependents"

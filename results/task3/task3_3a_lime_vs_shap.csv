@@ -1,0 +1,4 @@
+cliente,spearman_|w|_vs_|phi|,top3_LIME,top3_SHAP,coinciden_top3
+aprobado,0.7368421052631579,"purpose, residence_since, age","purpose, age, checking_status",2/3
+rechazado,0.9518796992481202,"credit_history, credit_amount, duration","credit_history, savings_status, credit_amount",2/3
+frontera,0.8691729323308269,"checking_status, duration, credit_amount","checking_status, duration, credit_amount",3/3

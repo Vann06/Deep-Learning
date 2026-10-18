@@ -1,0 +1,12 @@
+variable,phi,accionable,en_contrafactuales,valor_original,valor_nuevo,p_good_solo_ese_cambio,costo_en_distancia
+credit_history,-1.316188054861268,False,False,all paid,critical/other existing credit,0.3498375627047366,1.0
+credit_history,-1.316188054861268,False,False,all paid,delayed previously,0.33688863413013714,1.0
+credit_history,-1.316188054861268,False,False,all paid,existing paid,0.33688863413013714,1.0
+credit_history,-1.316188054861268,False,False,all paid,no credits/all paid,0.19613105222793956,1.0
+savings_status,0.9721066182595678,True,False,>=1000,100<=X<500,0.009910462499357554,1.0
+savings_status,0.9721066182595678,True,False,>=1000,500<=X<1000,0.010918656658298524,1.0
+savings_status,0.9721066182595678,True,False,>=1000,<100,0.010918656658298524,1.0
+savings_status,0.9721066182595678,True,False,>=1000,no known savings,0.048104502855489006,1.0
+credit_amount,-0.964672898951103,True,True,433.0,392.0,0.45642844573699354,0.03877068557919622
+credit_amount,-0.964672898951103,True,True,433.0,1000.0,0.170178797240824,0.5361702127659574
+credit_amount,-0.964672898951103,True,True,433.0,2000.0,0.24071069195157635,1.4817966903073285

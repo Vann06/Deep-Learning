@@ -1,0 +1,2 @@
+class,bbox,normalized_map_mass_inside_bbox,original_probability,probability_gray_outside_bbox,change_gray_minus_original
+banana,"(0, 80, 223, 208)",0.8618946075439453,0.7557435631752014,0.7569643259048462,0.0012207627296447754
